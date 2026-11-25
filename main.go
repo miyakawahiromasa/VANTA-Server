@@ -1,17 +1,26 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"www/internal/handlers"
 )
 
 func main() {
-	// 静的ファイルサーバーの設定
-	fs := http.FileServer(http.Dir("./public"))
-	http.Handle("/", fs)
-	// ハンドラを登録
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8080"
+	}
+
 	http.HandleFunc("/ws", handlers.HandleConnections)
-	// サーバの開始
-	http.ListenAndServe(":8080", nil)
+
+	log.Println("Server started on port", port)
+
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
